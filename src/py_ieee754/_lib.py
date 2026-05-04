@@ -13,7 +13,7 @@ import os
 import sys
 
 _suffixes = {"linux": ".so", "darwin": ".dylib", "win32": ".dll"}
-_lib_name = f"_py_ieee754_wrappers{_suffixes.get(sys.platform, '.so')}"
+_lib_name = f"libpy_ieee754_wrappers{_suffixes.get(sys.platform, '.so')}"
 
 
 def _find_library() -> str:
