@@ -14,11 +14,9 @@ from py_ieee754._fenv_bindings import (
     FE_DIVBYZERO,
     FE_DOWNWARD,
     FE_INEXACT,
-    FE_INVALID,
     FE_OVERFLOW,
     FE_TONEAREST,
     FE_TOWARDZERO,
-    FE_UNDERFLOW,
     FE_UPWARD,
 )
 
