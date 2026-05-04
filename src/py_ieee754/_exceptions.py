@@ -9,7 +9,6 @@ from __future__ import annotations
 import enum
 
 from py_ieee754._fenv_bindings import (
-    FE_ALL_EXCEPT,
     FE_DIVBYZERO,
     FE_INEXACT,
     FE_INVALID,
@@ -38,7 +37,6 @@ class FloatException(enum.IntFlag):
     UNDERFLOW = FE_UNDERFLOW
     INEXACT = FE_INEXACT
     INVALID = FE_INVALID
-    ALL = FE_ALL_EXCEPT
 
 
 class FloatExceptionError(FloatingPointError):

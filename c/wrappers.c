@@ -16,7 +16,6 @@ DLL_EXPORT int py_ieee754_get_FE_OVERFLOW(void) { return FE_OVERFLOW; }
 DLL_EXPORT int py_ieee754_get_FE_UNDERFLOW(void) { return FE_UNDERFLOW; }
 DLL_EXPORT int py_ieee754_get_FE_INEXACT(void) { return FE_INEXACT; }
 DLL_EXPORT int py_ieee754_get_FE_INVALID(void) { return FE_INVALID; }
-DLL_EXPORT int py_ieee754_get_FE_ALL_EXCEPT(void) { return FE_ALL_EXCEPT; }
 
 /* ---- fenv.h: rounding direction macros ---- */
 

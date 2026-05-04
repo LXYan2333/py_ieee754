@@ -11,7 +11,7 @@ from py_ieee754._lib import clib
 
 
 def _get(name: str) -> int:
-    f = getattr(clib, f"py_ieee754_get_{name}")
+    f = clib[f"py_ieee754_get_{name}"]
     f.argtypes = []
     f.restype = ct.c_int
     return f()
@@ -32,8 +32,6 @@ FE_INEXACT = _get("FE_INEXACT")
 FE_INVALID = _get("FE_INVALID")
 """C ``FE_INVALID`` — invalid operation exception flag."""
 
-FE_ALL_EXCEPT = _get("FE_ALL_EXCEPT")
-"""C ``FE_ALL_EXCEPT`` — bitwise OR of all exception flags."""
 
 FE_TONEAREST = _get("FE_TONEAREST")
 """C ``FE_TONEAREST`` — round to nearest, ties to even."""
