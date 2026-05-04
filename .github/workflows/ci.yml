@@ -1,74 +1,208 @@
-name: CI
+name: Build wheels
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: "${{ matrix.os }} (${{ matrix.arch }})"
-    runs-on: ${{ matrix.os }}
+  build-linux:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            arch: x64
-          - os: ubuntu-24.04-arm
-            arch: arm64
-          - os: windows-latest
-            arch: x64
-          - os: windows-11-arm
-            arch: arm64
-          - os: macos-latest
-            arch: arm64
-          - os: macos-15-intel
-            arch: x64
+        image:
+          - manylinux2014_x86_64
+          - manylinux_2_28_x86_64
+          - manylinux_2_34_x86_64
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
-      - name: Install build dependencies
-        run: pip install scikit-build-core pytest pytest-cov
-
-      - name: Build and install (non-Windows)
-        if: runner.os != 'Windows'
-        run: pip install -v --no-build-isolation .
-
-      - name: Build and install (Windows)
-        if: runner.os == 'Windows'
-        run: pip install -v --no-build-isolation .
-        env:
-          CMAKE_GENERATOR: "Ninja"
-
-      - name: Collect built wheel (non-Windows)
-        if: runner.os != 'Windows'
+      - name: Build, install, and run tests
         run: |
-          pip wheel --no-build-isolation -w dist .
-          echo "WHEEL_FILE=$(ls dist/*.whl)" >> "$GITHUB_ENV"
+          pip install cmake scikit-build-core
+          pip install .
+          pip install pytest
+          python -m pytest tests/ -v
 
-      - name: Collect built wheel (Windows)
-        if: runner.os == 'Windows'
+      - name: Build wheel via Docker
         run: |
-          pip wheel --no-build-isolation -w dist .
-          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
-          echo "WHEEL_FILE=$wheel" >> $env:GITHUB_ENV
+          docker build \
+            --build-arg BASE_IMAGE=quay.io/pypa/${{ matrix.image }} \
+            -t builder \
+            .
+          mkdir -p wheelhouse
+          docker run --rm \
+            -v "${{ github.workspace }}/wheelhouse:/wheelhouse" \
+            builder
 
-      - name: Upload wheel artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wheel-${{ matrix.os }}-${{ matrix.arch }}
-          path: dist/*.whl
+          name: wheels-${{ matrix.image }}
+          path: wheelhouse/*.whl
 
-      - name: Run tests
-        run: python -m pytest tests/ -v
+  build-linux-aarch64:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        image:
+          - manylinux2014_aarch64
+          - manylinux_2_28_aarch64
+          - manylinux_2_34_aarch64
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Build, install, and run tests
+        run: |
+          pip install cmake scikit-build-core
+          pip install .
+          pip install pytest
+          python -m pytest tests/ -v
+
+      - name: Build wheel via Docker
+        run: |
+          docker build \
+            --build-arg BASE_IMAGE=quay.io/pypa/${{ matrix.image }} \
+            -t builder \
+            .
+          mkdir -p wheelhouse
+          docker run --rm \
+            -v "${{ github.workspace }}/wheelhouse:/wheelhouse" \
+            builder
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.image }}
+          path: wheelhouse/*.whl
+
+  build-windows-x86_64:
+    name: windows-x86_64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tools
+        run: pip install cmake scikit-build-core
+
+      - name: Build, install, and run tests
+        run: |
+          pip install .
+          pip install pytest
+          python -m pytest tests/ -v
+
+      - name: Build wheel
+        run: pip wheel . --no-deps -w wheelhouse
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-x86_64
+          path: wheelhouse/*.whl
+
+  build-windows-arm64:
+    name: windows-arm64
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tools
+        run: pip install cmake scikit-build-core
+
+      - name: Build, install, and run tests
+        run: |
+          pip install .
+          pip install pytest
+          python -m pytest tests/ -v
+
+      - name: Build wheel
+        run: pip wheel . --no-deps -w wheelhouse
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-arm64
+          path: wheelhouse/*.whl
+
+  build-macos-arm64:
+    name: macos-arm64
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tools
+        run: pip install cmake scikit-build-core
+
+      - name: Build, install, and run tests
+        run: |
+          pip install .
+          pip install pytest
+          python -m pytest tests/ -v
+
+      - name: Build wheel
+        run: pip wheel . --no-deps -w wheelhouse
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-arm64
+          path: wheelhouse/*.whl
+
+  build-macos-x86_64:
+    name: macos-x86_64
+    runs-on: macos-26-intel
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tools
+        run: pip install cmake scikit-build-core
+
+      - name: Build, install, and run tests
+        run: |
+          pip install .
+          pip install pytest
+          python -m pytest tests/ -v
+
+      - name: Build wheel
+        run: pip wheel . --no-deps -w wheelhouse
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-x86_64
+          path: wheelhouse/*.whl
 
   coverage:
     name: Coverage (ubuntu-latest)
