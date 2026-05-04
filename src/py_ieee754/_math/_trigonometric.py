@@ -5,7 +5,7 @@ from __future__ import annotations
 import ctypes as ct
 from typing import overload
 
-from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, check_exceptions
+from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, FloatExceptionError, check_exceptions
 from py_ieee754._fenv_bindings import RoundingMode
 from py_ieee754._math._common import bind_1d, bind_1f, bind_2d, bind_2f
 
@@ -34,7 +34,7 @@ def sin[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -49,7 +49,7 @@ def cos[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -64,7 +64,7 @@ def tan[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -79,7 +79,7 @@ def asin[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -94,7 +94,7 @@ def acos[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -109,7 +109,7 @@ def atan[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -126,7 +126,7 @@ def atan2(
     x: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def atan2(
@@ -134,14 +134,14 @@ def atan2(
     x: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def atan2[T: (ct.c_float, ct.c_double)](
     y: T,
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(y, ct.c_float) and isinstance(x, ct.c_float):

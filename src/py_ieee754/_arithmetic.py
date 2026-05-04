@@ -13,7 +13,7 @@ from collections.abc import Callable
 import ctypes as ct
 from typing import TYPE_CHECKING, overload
 
-from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, check_exceptions
+from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, FloatExceptionError, check_exceptions
 from py_ieee754._fenv_bindings import RoundingMode
 from py_ieee754._lib import clib
 
@@ -102,7 +102,7 @@ def _bin_op(
     f32_func: Callable[[ct.c_float, ct.c_float, int], tuple[ct.c_float, int]],
     f64_func: Callable[[ct.c_double, ct.c_double, int], tuple[ct.c_double, int]],
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> IEEE754:
     """Promote operands, call the C wrapper, check exceptions, and return result."""
     from py_ieee754._types import F32
@@ -126,7 +126,7 @@ def add(
     b: IEEE754 | float,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> IEEE754:
     """Return ``a + b`` computed with IEEE 754 rounding.
 
@@ -156,7 +156,7 @@ def sub(
     b: IEEE754 | float,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> IEEE754:
     """Return ``a - b`` computed with IEEE 754 rounding.
 
@@ -182,7 +182,7 @@ def mul(
     b: IEEE754 | float,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> IEEE754:
     """Return ``a * b`` computed with IEEE 754 rounding.
 
@@ -208,7 +208,7 @@ def div(
     b: IEEE754 | float,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> IEEE754:
     """Return ``a / b`` computed with IEEE 754 rounding.
 

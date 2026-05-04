@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import ctypes as ct
 
-from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, check_exceptions
+from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, FloatExceptionError, check_exceptions
 from py_ieee754._fenv_bindings import RoundingMode
 from py_ieee754._math._common import bind_1d, bind_1f, bind_d_l, bind_d_ll, bind_f_l, bind_f_ll
 
@@ -40,7 +40,7 @@ def ceil[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -55,7 +55,7 @@ def floor[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -70,7 +70,7 @@ def trunc[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -85,7 +85,7 @@ def round_[T: (ct.c_float, ct.c_double)](  # noqa: A001
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -100,7 +100,7 @@ def nearbyint[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -115,7 +115,7 @@ def rint[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -130,7 +130,7 @@ def lround[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_long:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -145,7 +145,7 @@ def llround[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_longlong:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -160,7 +160,7 @@ def lrint[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_long:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -175,7 +175,7 @@ def llrint[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_longlong:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):

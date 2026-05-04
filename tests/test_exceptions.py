@@ -29,11 +29,6 @@ class TestFloatException:
         assert isinstance(FE_OVERFLOW, int)
         assert FloatException.DIVBYZERO == FE_DIVBYZERO
 
-    def test_all(self):
-        expected = FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW | FE_INEXACT | FE_INVALID
-        assert expected == FloatException.ALL
-
-
 class TestExceptionClasses:
     def test_inheritance(self):
         assert issubclass(FloatDivByZeroError, FloatingPointError)

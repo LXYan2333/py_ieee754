@@ -6,7 +6,7 @@ from __future__ import annotations
 import ctypes as ct
 from typing import overload
 
-from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, check_exceptions
+from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, FloatExceptionError, check_exceptions
 from py_ieee754._fenv_bindings import RoundingMode
 from py_ieee754._math._common import (
     bind_1d,
@@ -50,7 +50,7 @@ def frexp[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> tuple[ct.c_double | ct.c_float, ct.c_int]:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -67,7 +67,7 @@ def ldexp(
     exp: ct.c_int,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def ldexp(
@@ -75,14 +75,14 @@ def ldexp(
     exp: ct.c_int,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def ldexp[T: (ct.c_float, ct.c_double)](
     x: T,
     exp: ct.c_int,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -97,7 +97,7 @@ def modf[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> tuple[ct.c_double | ct.c_float, ct.c_double | ct.c_float]:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -114,7 +114,7 @@ def scalbn(
     n: ct.c_int,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def scalbn(
@@ -122,14 +122,14 @@ def scalbn(
     n: ct.c_int,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def scalbn[T: (ct.c_float, ct.c_double)](
     x: T,
     n: ct.c_int,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -144,7 +144,7 @@ def ilogb[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_int:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -159,7 +159,7 @@ def logb[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -176,7 +176,7 @@ def nextafter(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def nextafter(
@@ -184,14 +184,14 @@ def nextafter(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def nextafter[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -210,7 +210,7 @@ def copysign(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def copysign(
@@ -218,14 +218,14 @@ def copysign(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def copysign[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):

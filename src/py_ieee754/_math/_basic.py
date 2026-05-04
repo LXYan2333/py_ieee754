@@ -5,7 +5,7 @@ from __future__ import annotations
 import ctypes as ct
 from typing import overload
 
-from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, check_exceptions
+from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, FloatExceptionError, check_exceptions
 from py_ieee754._fenv_bindings import RoundingMode
 from py_ieee754._math._common import (
     bind_1d,
@@ -50,7 +50,7 @@ def fabs[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -67,7 +67,7 @@ def fmod(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def fmod(
@@ -75,14 +75,14 @@ def fmod(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def fmod[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -101,7 +101,7 @@ def remainder(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def remainder(
@@ -109,14 +109,14 @@ def remainder(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def remainder[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -135,7 +135,7 @@ def remquo(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> tuple[ct.c_float, ct.c_int]: ...
 @overload
 def remquo(
@@ -143,14 +143,14 @@ def remquo(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> tuple[ct.c_double, ct.c_int]: ...
 def remquo[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> tuple[ct.c_double | ct.c_float, ct.c_int]:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -170,7 +170,7 @@ def fma(
     z: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def fma(
@@ -179,7 +179,7 @@ def fma(
     z: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def fma[T: (ct.c_float, ct.c_double)](
     x: T,
@@ -187,7 +187,7 @@ def fma[T: (ct.c_float, ct.c_double)](
     z: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float) and isinstance(z, ct.c_float):
@@ -206,7 +206,7 @@ def fmax(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def fmax(
@@ -214,14 +214,14 @@ def fmax(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def fmax[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -240,7 +240,7 @@ def fmin(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def fmin(
@@ -248,14 +248,14 @@ def fmin(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def fmin[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -274,7 +274,7 @@ def fdim(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def fdim(
@@ -282,14 +282,14 @@ def fdim(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def fdim[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -306,7 +306,7 @@ def nan(
     tag: str = "",
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_double:
     result, excepts = _nan(ct.c_char_p(tag.encode()), _rnd(round_mode))
     check_exceptions(excepts, unsuppressed)
@@ -317,7 +317,7 @@ def nanf(
     tag: str = "",
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> ct.c_float:
     result, excepts = _nanf(ct.c_char_p(tag.encode()), _rnd(round_mode))
     check_exceptions(excepts, unsuppressed)

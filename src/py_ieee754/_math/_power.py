@@ -5,7 +5,7 @@ from __future__ import annotations
 import ctypes as ct
 from typing import overload
 
-from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, check_exceptions
+from py_ieee754._exceptions import DEFAULT_UNSUPPRESSED, FloatExceptionError, check_exceptions
 from py_ieee754._fenv_bindings import RoundingMode
 from py_ieee754._math._common import bind_1d, bind_1f, bind_2d, bind_2f
 
@@ -30,7 +30,7 @@ def pow_(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def pow_(
@@ -38,14 +38,14 @@ def pow_(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def pow_[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
@@ -62,7 +62,7 @@ def sqrt[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -77,7 +77,7 @@ def cbrt[T: (ct.c_float, ct.c_double)](
     x: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float):
@@ -94,7 +94,7 @@ def hypot(
     y: ct.c_float,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_float: ...
 @overload
 def hypot(
@@ -102,14 +102,14 @@ def hypot(
     y: ct.c_double,
     *,
     round_mode: RoundingMode | None = ...,
-    unsuppressed: set[type[FloatingPointError]] = ...,
+    unsuppressed: set[type[FloatExceptionError]] = ...,
 ) -> ct.c_double: ...
 def hypot[T: (ct.c_float, ct.c_double)](
     x: T,
     y: T,
     *,
     round_mode: RoundingMode | None = None,
-    unsuppressed: set[type[FloatingPointError]] = DEFAULT_UNSUPPRESSED,
+    unsuppressed: set[type[FloatExceptionError]] = DEFAULT_UNSUPPRESSED,
 ) -> T:
     rnd = _rnd(round_mode)
     if isinstance(x, ct.c_float) and isinstance(y, ct.c_float):
