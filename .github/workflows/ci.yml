@@ -219,7 +219,7 @@ jobs:
         run: pip install scikit-build-core pytest pytest-cov
 
       - name: Build and install
-        run: pip install -v --no-build-isolation .
+        run: pip install -v .
 
       - name: Run tests with coverage
         run: python -m pytest tests/ --cov=py_ieee754 --cov-branch --cov-report=json --cov-report=term-missing
