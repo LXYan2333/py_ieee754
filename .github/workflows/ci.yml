@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: "${{ matrix.os }} (${{ matrix.arch }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          - os: windows-latest
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+          - os: macos-latest
+            arch: arm64
+          - os: macos-15-intel
+            arch: x64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build dependencies
+        run: pip install scikit-build-core pytest pytest-cov
+
+      - name: Build and install (non-Windows)
+        if: runner.os != 'Windows'
+        run: pip install -v --no-build-isolation .
+
+      - name: Build and install (Windows)
+        if: runner.os == 'Windows'
+        run: pip install -v --no-build-isolation .
+        env:
+          CMAKE_GENERATOR: "Ninja"
+
+      - name: Collect built wheel (non-Windows)
+        if: runner.os != 'Windows'
+        run: |
+          pip wheel --no-build-isolation -w dist .
+          echo "WHEEL_FILE=$(ls dist/*.whl)" >> "$GITHUB_ENV"
+
+      - name: Collect built wheel (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pip wheel --no-build-isolation -w dist .
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+          echo "WHEEL_FILE=$wheel" >> $env:GITHUB_ENV
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/*.whl
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+  coverage:
+    name: Coverage (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install scikit-build-core pytest pytest-cov
+
+      - name: Build and install
+        run: pip install -v --no-build-isolation .
+
+      - name: Run tests with coverage
+        run: python -m pytest tests/ --cov=py_ieee754 --cov-branch --cov-report=json --cov-report=term-missing
+
+      - name: Update Coverage Badge
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: we-cli/coverage-badge-action@main

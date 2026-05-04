@@ -1,0 +1,323 @@
+
+
+Wikipedia The Free Encyclopedia
+
+    Donate
+    Create account
+    Log in
+
+Contents
+(Top)
+Floating point
+
+    Comparison with NaN
+    Operations generating NaN
+    Quiet NaN
+    Signaling NaN
+    Payload operations
+    Encoding
+    Canonical NaN
+
+Function definition
+
+Integer NaN
+
+Display
+
+References
+
+        Notes
+        Citations
+        Standards
+    External links
+
+NaN
+
+    Article
+    Talk
+
+English
+
+    Read
+    Edit
+    View history
+
+Tools
+
+Appearance
+Text
+
+    Small
+    Standard
+    Large
+
+Width
+
+    Standard
+    Wide
+
+Color
+
+    Automatic
+    Light
+    Dark
+
+From Wikipedia, the free encyclopedia
+The printable version is no longer supported and may have rendering errors. Please update your browser bookmarks and please use the default browser print function instead.
+For other uses, see Nan.
+An example of NaN appearing as a calculation error for input N/A on an electronic weather forecast
+
+In computing, NaN (/næn/), standing for Not a Number, is a particular value of a numeric data type (often a floating-point number) which is undefined as a number, such as the result of 0/0. Systematic use of NaNs was introduced by the IEEE 754 floating-point standard in 1985, along with the representation of other non-finite quantities such as infinities.
+
+In mathematics, the result of ⁠0/0⁠ is typically not defined as a number[a] and may therefore be represented by NaN in computing systems.
+
+The square root of a negative number is not a real number, and is therefore also represented by NaN in compliant computing systems. NaNs may also be used to represent missing values in computations.[1][2]
+
+Two separate kinds of NaNs are provided, termed quiet NaNs and signaling NaNs. Quiet NaNs are used to propagate errors resulting from invalid operations or values. Signaling NaNs can support advanced features such as mixing numerical and symbolic computation or other extensions to basic floating-point arithmetic.
+Floating point
+Floating-point formats
+IEEE 754
+
+    16-bit: Half (binary16)
+    32-bit: Single (binary32), decimal32
+    64-bit: Double (binary64), decimal64
+    128-bit: Quadruple (binary128), decimal128
+    256-bit: Octuple (binary256)
+    Extended precision
+
+Other
+
+    Minifloat
+    bfloat16
+    TensorFloat-32
+    Microsoft Binary Format
+    IBM hexadecimal floating-point
+    PMBus Linear-11
+    G.711 8-bit floats
+
+Alternatives
+
+    Arbitrary precision
+    Block floating point
+
+Tapered floating point
+
+    Posit
+
+    vte
+
+In floating-point calculations, NaN is not the same as infinity, although both are typically handled as special cases in floating-point representations of real numbers as well as in floating-point operations. An invalid operation is also not the same as an arithmetic overflow (which would return an infinity or the largest finite number in magnitude) or an arithmetic underflow (which would return the smallest normal number in magnitude, a subnormal number, or zero).
+
+In the IEEE 754 binary interchange formats, NaNs are encoded with the exponent field filled with ones (like infinity values), and some non-zero number in the trailing significand field (to make them distinct from infinity values); this allows the definition of multiple distinct NaN values, depending on which bits are set in the trailing significand field, but also on the value of the leading sign bit (but applications are not required to provide distinct semantics for those distinct NaN values).
+
+For example, an IEEE 754 single precision (32-bit) NaN would be encoded as
+s111 1111 1xxx xxxx xxxx xxxx xxxx xxxx
+
+where s is the sign (most often ignored in applications) and the x sequence represents a non-zero number (the value zero encodes infinities). In practice, the most significant bit from x is used to determine the type of NaN: "quiet NaN" or "signaling NaN" (see details in Encoding). The remaining bits encode a payload (most often ignored in applications).
+
+Floating-point operations other than ordered comparisons normally propagate a quiet NaN (qNaN). Most floating-point operations on a signaling NaN (sNaN) signal the invalid-operation exception; the default exception action is then the same as for qNaN operands and they produce a qNaN if producing a floating-point result.
+
+The propagation of quiet NaNs through arithmetic operations allows errors to be detected at the end of a sequence of operations without extensive testing during intermediate stages. For example, if one starts with a NaN and adds 1 five times in a row, each addition results in a NaN, but there is no need to check each calculation because one can just note that the final result is NaN. However, depending on the language and the function, NaNs can silently be removed from a chain of calculations where one calculation in the chain would give a constant result for all other floating-point values. For example, the calculation x0 may produce the result 1, even where x is NaN, so checking only the final result would obscure the fact that a calculation before the x0 resulted in a NaN. In general, then, a later test for a set invalid flag is needed to detect all cases where NaNs are introduced[3] (see Function definition below for further details).
+
+In section 6.2 of the old IEEE 754-2008 standard, there are two anomalous functions (the maxNum and minNum functions, which return the maximum and the minimum, respectively, of two operands that are expected to be numbers) that favor numbers — if just one of the operands is a NaN then the value of the other operand is returned. The IEEE 754-2019 revision has replaced these functions as they are not associative (when a signaling NaN appears in an operand).[4][5]
+Comparison with NaN
+
+Comparisons are specified by the IEEE 754 standard to take into account possible NaN operands.[6] When comparing two real numbers, or extended real numbers (as in the IEEE 754 floating-point formats), the first number may be either less than, equal to, or greater than the second number. This gives three possible relations. But when at least one operand of a comparison is NaN, this trichotomy does not apply, and a fourth relation is needed: unordered. In particular, two NaN values compare as unordered, not as equal.
+
+As specified, the predicates associated with the <, ≤, =, ≥, > mathematical symbols (or equivalent notation in programming languages) return false on an unordered relation. So, for instance, NOT(x < y) is not logically equivalent to x ≥ y: on unordered, i.e. when x or y is NaN, the former returns true while the latter returns false. However, ≠ is defined as the negation of =, thus it returns true on unordered.
+Comparison between NaN and any floating-point value x
+(including NaN and ±∞) Comparison 	NaN ≥ x 	NaN ≤ x 	NaN > x 	NaN < x 	NaN = x 	NaN ≠ x
+Result 	False 	False 	False 	False 	False 	True
+
+From these rules, comparing x with itself, x ≠ x or x = x, can be used to test whether x is NaN or non-NaN.
+
+The comparison predicates are either signaling or non-signaling on quiet NaN operands; the signaling versions signal the invalid-operation exception for such comparisons (i.e., by default, this just sets the corresponding status flag in addition to the behavior of the non-signaling versions). The equality and inequality predicates are non-signaling. The other standard comparison predicates associated with the above mathematical symbols are all signaling if they receive a NaN operand. The standard also provides non-signaling versions of these other predicates. The predicate isNaN(x) determines whether a value is a NaN and never signals an exception, even if x is a signaling NaN.
+
+The IEEE floating-point standard requires that NaN ≠ NaN hold. In contrast, the 2022 private standard of posit arithmetic has a similar concept, NaR (Not a Real), where NaR = NaR holds.[7]
+Operations generating NaN
+
+There are three kinds of operations that can return NaN:[8]
+
+    Most operations with at least one NaN operand.
+    Indeterminate forms:
+        The divisions (±0) / (±0) and (±∞) / (±∞).
+        The multiplications (±0) × (±∞) and (±∞) × (±0).
+        Remainder x % y when x is an infinity or y is zero.
+        The additions (+∞) + (−∞), (−∞) + (+∞) and equivalent subtractions (+∞) − (+∞) and (−∞) − (−∞).
+        The nth root function x n {\displaystyle {\sqrt[{n}]{x}}} when n {\displaystyle n} is zero.
+        Trigonometric functions on infinities: sin(±∞), cos(±∞), tan(±∞).
+        The standard treats two-argument arctangent specially: its indeterminate forms atan2(±0,±0) and atan2(±∞,±∞) are not NaN but instead various multiples of π/4.
+        The standard has alternative functions for powers:
+            The standard pow function and the integer exponent pown function define 00, 1(±∞), and (±∞)0 as 1.
+            The powr function defines all three indeterminate forms as invalid operations and so returns NaN.
+    Real operations with complex results, for example:
+        The square root of a negative number.
+        The logarithm of a negative number.
+        The inverse sine or inverse cosine of a number that is less than −1 or greater than 1.
+        The nth root function x n {\displaystyle {\sqrt[{n}]{x}}} when x {\displaystyle x} is a negative number and n {\displaystyle n} is an even number.
+        For the power operation x y {\displaystyle x^{y}} with x {\displaystyle x} being a negative number, the standard pow and powr functions behave differently: powr always returns NaN in this case, while pow will only return NaN if y {\displaystyle y} is not an integer.
+
+NaNs may also be explicitly assigned to variables, typically as a representation for missing values. Prior to the IEEE standard, programmers often used a special value (such as −99999999) to represent undefined or missing values, but there was no guarantee that they would be handled consistently or correctly.[1]
+
+NaNs are not necessarily generated in all the above cases. If an operation can produce an exception condition and traps are not masked then the operation will cause a trap instead.[9] If an operand is a quiet NaN, and there is also no signaling NaN operand, then there is no exception condition and the result is a quiet NaN. Explicit assignments will not cause an exception even for signaling NaNs.
+Quiet NaN
+
+In general, quiet NaNs, or qNaNs, do not raise any additional exceptions, as they propagate through most operations. But the invalid-operation exception is signaled by some operations that do not return a floating-point value, such as format conversions or certain comparison operations.
+Signaling NaN
+
+Signaling NaNs, or sNaNs, are special forms of a NaN that, when consumed by most operations, should raise the invalid operation exception and then, if appropriate, be "quieted" into a qNaN that may then propagate. They were introduced in IEEE 754. There have been several ideas for how these might be used:
+
+    Filling uninitialized memory with signaling NaNs would produce the invalid operation exception if the data is used before it is initialized
+    Using an sNaN as a placeholder for a more complicated object, such as:
+        A representation of a number that has underflowed
+        A representation of a number that has overflowed
+        Number in a higher precision format
+        A complex number
+
+When encountered, a trap handler could decode the sNaN and return an index to the computed result. In practice, this approach is faced with many complications. The treatment of the sign bit of NaNs for some simple operations (such as absolute value) is different from that for arithmetic operations. Traps are not required by the standard.[citation needed]
+Payload operations
+
+IEEE 754-2019 recommends the operations getPayload, setPayload, and setPayloadSignaling be implemented,[10] standardizing the access to payloads to streamline application use.[11] According to the IEEE 754-2019 background document, this recommendation should be interpreted as "required for new implementations, with reservation for backward compatibility".[12]
+Encoding
+
+In IEEE 754 interchange formats, NaNs are identified by specific, pre-defined bit patterns unique to NaNs. The sign bit does not matter. For the binary formats, NaNs are represented with the exponent field filled with ones (like infinity values), and some non-zero number in the trailing significand field (to make them distinct from infinity values). The original IEEE 754 standard from 1985 (IEEE 754-1985) only described binary floating-point formats, and did not specify how the signaling/quiet state was to be tagged. In practice, the most significant bit of the trailing significand field determined whether a NaN is signaling or quiet. Two different implementations, with reversed meanings, resulted:
+
+    most processors (including those of the Intel and AMD's x86 family, the Motorola 68000 family, the AIM PowerPC family, the ARM family, the Sun SPARC family, and optionally new MIPS processors) set the signaling/quiet bit to non-zero if the NaN is quiet, and to zero if the NaN is signaling. Thus, on these processors, the bit represents an is_quiet flag;
+    in NaNs generated by the PA-RISC and old MIPS processors, the signaling/quiet bit is zero if the NaN is quiet, and non-zero if the NaN is signaling. Thus, on these processors, the bit represents an is_signaling flag.
+
+The former choice has been preferred as it allows the implementation to quiet a signaling NaN by just setting the signaling/quiet bit to 1. The reverse is not possible with the latter choice because setting the signaling/quiet bit to 0 could yield an infinity.[13]
+
+The 2008 and 2019 revisions of the IEEE 754 standard make formal requirements and recommendations for the encoding of the signaling/quiet state.
+
+    For binary interchange formats, the most significant bit of the trailing significand field is exclusively used to distinguish between quiet and signaling NaNs.[14] (This requirement has been added in the 2019 revision.) Moreover, it should be an is_quiet flag.[15] That is, this bit is non-zero if the NaN is quiet, and zero if the NaN is signaling.
+    For decimal interchange formats, whether binary or decimal encoded, a NaN is identified by having the top five bits of the combination field after the sign bit set to ones. The sixth bit of the field is the is_signaling flag. That is, this bit is zero if the NaN is quiet, and non-zero if the NaN is signaling.[16]
+
+For IEEE 754-2008 conformance, the meaning of the signaling/quiet bit in recent MIPS processors is now configurable via the NAN2008 field of the FCSR register. This support is optional in MIPS Release 3 and required in Release 5.[17]
+
+The state of the remaining bits of the trailing significand field are not defined by the standard. These bits encode a value called the 'payload' of the NaN. For the binary formats, the encoding is unspecified. For the decimal formats, the usual encoding of unsigned integers is used. If an operation has a single NaN input and propagates it to the output, the result NaN's payload should be that of the input NaN (this is not always possible for binary formats when the signaling/quiet state is encoded by an is_signaling flag, as explained above). If there are multiple NaN inputs, the result NaN's payload should be from one of the input NaNs; the standard does not specify which.
+Canonical NaN
+
+A number of systems have the concept of a "canonical NaN", where one specific NaN value is chosen to be the only possible qNaN generated by floating-point operations not having a NaN input. The value is usually chosen to be a quiet NaN with an all-zero payload and an arbitrarily defined sign bit.
+
+    On RISC-V, most floating-point operations only ever generate the canonical NaN, even if a NaN is given as the operand (the payload is not propagated).[18][b] ARM can enable a "default NaN" mode for this behavior.[20] WebAssembly has the same behavior, though it allows two canonical values.[21]
+    A number of languages do not distinguish among different NaN values, without requiring their implementations to force a certain NaN value. ECMAScript (JavaScript) code treats all NaN as if they are the same value.[22] Java has the same treatment "for the most part".[23]
+
+Using a limited amount of NaN representations allows the system to use other possible NaN values for non-arithmetic purposes, the most important being "NaN-boxing", i.e. using the payload for arbitrary data.[24] (This concept of "canonical NaN" is not the same as the concept of a "canonical encoding" in IEEE 754.)
+Function definition
+
+There are differences of opinion about the proper definition for the result of a numeric function that receives a quiet NaN as input. One view is that the NaN should propagate to the output of the function in all cases to propagate the indication of an error. Another view, and the one taken by the ISO C99 and IEEE 754-2008 standards in general, is that if the function has multiple arguments and the output is uniquely determined by all the non-NaN inputs (including infinity), then that value should be the result. Thus for example the value returned by hypot(±∞, qNaN) and hypot(qNaN, ±∞) is +∞.
+
+The problem is particularly acute for the exponentiation function pow(x, y) = xy. The expressions 00, ∞0 and 1∞ are considered indeterminate forms when they occur as limits (just like ∞ × 0), and the question of whether zero to the zero power should be defined as 1 has divided opinion.
+
+If the output is considered as undefined when a parameter is undefined, then pow(1, qNaN) should produce a qNaN. However, math libraries have typically returned 1 for pow(1, y) for any real number y, and even when y is an infinity. Similarly, they produce 1 for pow(x, 0) even when x is 0 or an infinity. The rationale for returning the value 1 for the indeterminate forms was that the value of functions at singular points can be taken as a particular value if that value is in the limit the value[clarification needed] for all but a vanishingly small part of a ball around the limit value of the parameters.[citation needed] The 2008 version of the IEEE 754 standard says that pow(1, qNaN) and pow(qNaN, 0) should both return 1 since they return 1 whatever else is used instead of quiet NaN. Moreover, ISO C99, and later IEEE 754-2008, chose to specify pow(−1, ±∞) = 1 instead of qNaN; the reason of this choice is given in the C rationale:[25] "Generally, C99 eschews a NaN result where a numerical value is useful. ... The result of pow(−2, ∞) is +∞, because all large positive floating-point values are even integers."
+
+To satisfy those wishing a more strict interpretation of how the power function should act, the 2008 standard defines two additional power functions: pown(x, n), where the exponent must be an integer, and powr(x, y), which returns a NaN whenever a parameter is a NaN or the exponentiation would give an indeterminate form.
+Integer NaN
+
+Most fixed-size integer formats cannot explicitly indicate invalid data. In such a case, when converting NaN to an integer type, the IEEE 754 standard requires that the invalid-operation exception be signaled.
+
+For example in Java, such operations throw instances of java.lang.ArithmeticException.[26]
+
+In C, they lead to undefined behavior, but if annex F is supported, the operation yields an "invalid" floating-point exception (as required by the IEEE standard) and an unspecified value.
+
+In the R language, the minimal signed value (i.e. 0x80000000) of integers is reserved for NA (Not available).[citation needed] Conversions from NaN (or double NA) to integers then yield a NA integer.
+
+Perl's Math::BigInt package uses "NaN" for the result of strings that do not represent valid integers.[27]
+
+> perl -mMath::BigInt -e "print Math::BigInt->new('foo')"
+NaN
+
+Display
+
+Different operating systems and programming languages may have different string representations of NaN.
+
+nan (C, C++, Python, Zig)
+NaN (ECMAScript, Rust, C#, Julia, Java). Julia may show alternative NaN, depending on precision, NaN32, and NaN16; NaN is for Float64 type.
+NaN% 
+NAN (C, C++, Rust)
+NaNQ (IBM XL and AIX: Fortran, C++ proposal n2290)
+NaNS (ditto)
+qNaN
+sNaN
+1.#SNAN (Excel)
+1.#QNAN (Excel)
+-1.#IND (Excel)
++nan.0 (Scheme)
+
+Since, in practice, encoded NaNs have a sign, a quiet/signaling bit and optional 'diagnostic information' (sometimes called a payload), these will occasionally be found in string representations of NaNs, too. Some examples are:
+
+    For the C and C++ languages, the sign bit is always shown by the standard-library functions (e.g. -nan) when present. There is no standard display of the payload nor of the signaling status, but a quiet NaN value of a specific payload may either be constructed by providing the string nan(char-sequence) to a number-parsing function (e.g. strtod) or by providing the char-sequence string to nan() (or nans() for sNaN), both interpreted in an implementation-defined manner.
+        GCC and LLVM provide built-in implementations of nan() and nans(). They parse the char-sequence as an integer for strtoull (or a differently sized equivalent) with its detection of integer bases.
+        The glibc (GNU C Library) float parser uses the char-sequence string in "some unspecified fashion".[28] In practice, this parsing has been equivalent to GCC/LLVM's for up to 64 bits of payload.
+        Newlib does not implement nan() parsing, but strtod() accepts a hexadecimal format without prefix.
+        musl does not implement any payload parsing.
+
+Not all languages admit the existence of multiple NaNs. For example, ECMAScript only uses one NaN value throughout.
+References
+Notes
+
+    0/0 is undefined as a number in both the real number and extended real number systems, while 1/±0, for example, could be consistently assigned a value of ±∞ in the latter system, assuming a signed zero.
+    IEEE 754-2008 recommends, but does not require, propagation of the NaN payload. Most processors choose to obey this recommendation, but do not by themselves generate a non-zero payload.[19] The RISC-V behavior is thus non-recommended but compliant.
+
+Citations
+
+    Bowman, Kenneth (2006). An Introduction to Programming with IDL: Interactive Data Language. Academic Press. p. 26. ISBN 978-0-12-088559-6.
+    Press, William H.; Teukolsky, Saul A.; Vetterling, William T.; Flannery, Brian P. (2007). Numerical Recipes: The Art of Scientific Computing. Cambridge University Press. p. 34. ISBN 978-0-521-88068-8.
+    William Kahan (1 October 1997). "Lecture Notes on the Status of IEEE Standard 754 for Binary Floating-Point Arithmetic" (PDF).
+    David H.C. Chen (21 February 2017). "The Removal/Demotion of MinNum and MaxNum Operations from IEEE 754-2018" (PDF). Retrieved 6 May 2019.
+    "754R Minutes". 19 May 2017. Retrieved 25 June 2017.
+    IEEE 754 2019, §5.11
+    Standard for Posit Arithmetic (2022)
+    David Goldberg (1991). "What Every Computer Scientist Should Know About Floating-Point".
+    "Intel 64 and IA-32 Architectures Software Developer's Manual Volume 1: Basic Architecture". April 2008. pp. 118–125, 266–267, 334–335.
+    IEEE 754 2019, §9.7
+    "Background discussion for the new Payload functions".
+    "IEEE Standard for Floating-Point Arithmetic revision due in 2019" (PDF).
+    "Re: (long) sNaNs not what they could be..." IEEE. 15 October 2010. Retrieved 5 November 2020.
+    IEEE 754 2019, §3.4
+    IEEE 754 2019, §6.2.1
+    IEEE 754 2019, §3.5.2
+    "MIPS Architecture For Programmers – Volume I-A: Introduction to the MIPS64 Architecture" (PDF). MIPS Technologies, Inc. 20 November 2013. p. 79. Archived from the original (PDF) on 28 September 2017. Retrieved 27 September 2017.
+    Embeddev, Five. ""F" Standard Extension for Single-Precision Floating-Point, Version 2.2 / RISC-V Instruction Set Manual, Volume I: RISC-V User-Level ISA". Five EmbedDev.
+        Fog, Agner (11 April 2018). "NaN payload propagation - unresolved issues" (PDF).
+        Fog Agner (27 April 2020). "Floating point exception tracking and NAN propagation" (PDF).
+    "NaN handling and the Default NaN (ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition)". Documentation – Arm Developer.
+    "What is the motivation for 'NaN' canonicalization? · Issue #1463 · WebAssembly/design". GitHub. – see response by Dan Gohman "sunfishcode"
+    "ECMAScript® 2026 Language Specification - 6.1.6.1 The Number Type". tc39.es. "In some implementations, external code might be able to detect a difference between various NaN values, but such behaviour is implementation-defined; to ECMAScript code, all NaN values are indistinguishable from each other."
+    "Chapter 4. Types, Values, and Variables". docs.oracle.com. "For the most part, the Java SE platform treats NaN values of a given type as though collapsed into a single canonical value, and hence this specification normally refers to an arbitrary NaN as though to a canonical value."
+    Nystrom, Robert (28 July 2021). "§ 30.3 NaN Boxing". Crafting Interpreters. Genever Benning. ISBN 978-0-9905829-3-9.
+    "Rationale for International Standard—Programming Languages—C, Revision 5.10" (PDF). April 2003. p. 180.
+    "ArithmeticException (Java Platform SE 8)". docs.oracle.com.
+    "Math::BigInt". perldoc.perl.org. Retrieved 12 June 2015.
+    "Parsing of Floats (The GNU C Library)". sourceware.org. Retrieved 1 October 2025. "If chars… are provided, they are used in some unspecified fashion to select a particular representation of NaN (there can be several)."
+
+Standards
+
+    IEEE Computer Society (29 August 2008). IEEE Standard for Floating-Point Arithmetic. IEEE. pp. 1–70. doi:10.1109/IEEESTD.2008.4610935. ISBN 978-0-7381-5753-5. IEEE Std 754-2008.
+    IEEE Computer Society (22 July 2019). IEEE Standard for Floating-Point Arithmetic. IEEE. pp. 1–84. doi:10.1109/IEEESTD.2019.8766229. ISBN 978-1-5044-5924-2. IEEE Std 754-2019.
+
+External links
+
+    Not a Number, foldoc.org
+    IEEE 754-2008 Standard for Floating-Point Arithmetic (subscription required)
+    IEEE 754-2019 Standard for Floating-Point Arithmetic (subscription required)
+
+Retrieved from "https://en.wikipedia.org/w/index.php?title=NaN&oldid=1347315812"
+
+    This page was last edited on 6 April 2026, at 00:17 (UTC).
+    Text is available under the Creative Commons Attribution-ShareAlike 4.0 License; additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy. Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc., a non-profit organization.
+
+    Privacy policy
+    About Wikipedia
+    Disclaimers
+    Contact Wikipedia
+    Legal & safety contacts
+    Code of Conduct
+    Developers
+    Statistics
+    Cookie statement
+    Mobile view
+
+    Wikimedia Foundation
+    Powered by MediaWiki
+
