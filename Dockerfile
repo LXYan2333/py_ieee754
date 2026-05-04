@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-RUN /opt/python/cp310-cp310/bin/pip install auditwheel cmake
+RUN /opt/python/cp313-cp313/bin/pip install auditwheel cmake
 
 COPY . /project
 WORKDIR /project
