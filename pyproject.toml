@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "py_ieee754"
-version = "0.1.0"
+version = "0.1.1"
 description = "IEEE 754 float module with bit-operation and round arithmetic support"
 readme = "README.md"
 requires-python = ">=3.13"
