@@ -266,8 +266,18 @@ class IEEE754(ABC):
 
     @property
     def size_bits(self) -> int:
-        """Total number of bits in the representation."""
+        """Total number of bits in the representation (32 for F32, 64 for F64)."""
         return self._total_bits()
+
+    @property
+    def exp_len(self) -> int:
+        """Number of exponent bits (8 for F32, 11 for F64)."""
+        return self._exp_width()
+
+    @property
+    def sig_len(self) -> int:
+        """Number of trailing significand bits (23 for F32, 52 for F64)."""
+        return self._sig_width()
 
     # ---- Decomposition / construction ----
 
