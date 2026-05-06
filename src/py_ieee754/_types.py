@@ -210,6 +210,19 @@ class IEEE754(ABC):
         return int(self.value)
 
     @property
+    def __numpy_dtype__(self):
+        """numpy dtype interop (NumPy 2.4+).  Returns the corresponding NumPy dtype."""
+        import numpy as np
+
+        match self._val_t:
+            case ct.c_float:
+                return np.dtype(np.float32)
+            case ct.c_double:
+                return np.dtype(np.float64)
+            case _:
+                raise NotImplementedError()
+
+    @property
     def bits(self) -> int:
         """Raw bit pattern as an :class:`int`."""
         return self._as_int

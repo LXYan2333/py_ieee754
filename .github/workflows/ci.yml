@@ -30,7 +30,7 @@ jobs:
         run: |
           pip install cmake scikit-build-core
           pip install .
-          pip install pytest
+          pip install pytest numpy
           python -m pytest tests/ -v
 
       - name: Build wheel via Docker
@@ -72,7 +72,7 @@ jobs:
         run: |
           pip install cmake scikit-build-core
           pip install .
-          pip install pytest
+          pip install pytest numpy
           python -m pytest tests/ -v
 
       - name: Build wheel via Docker
@@ -108,7 +108,7 @@ jobs:
       - name: Build, install, and run tests
         run: |
           pip install .
-          pip install pytest
+          pip install pytest numpy
           python -m pytest tests/ -v
 
       - name: Build wheel
@@ -136,7 +136,7 @@ jobs:
       - name: Build, install, and run tests
         run: |
           pip install .
-          pip install pytest
+          pip install pytest numpy
           python -m pytest tests/ -v
 
       - name: Build wheel
@@ -164,7 +164,7 @@ jobs:
       - name: Build, install, and run tests
         run: |
           pip install .
-          pip install pytest
+          pip install pytest numpy
           python -m pytest tests/ -v
 
       - name: Build wheel
@@ -192,7 +192,7 @@ jobs:
       - name: Build, install, and run tests
         run: |
           pip install .
-          pip install pytest
+          pip install pytest numpy
           python -m pytest tests/ -v
 
       - name: Build wheel
@@ -216,7 +216,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip install scikit-build-core pytest pytest-cov
+        run: pip install scikit-build-core pytest pytest-cov numpy
 
       - name: Build and install
         run: pip install -v .
