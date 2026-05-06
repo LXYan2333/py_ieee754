@@ -461,6 +461,26 @@ class TestNumpyDtype:
     def test_f64_dtype(self):
         assert F64(1.5).__numpy_dtype__ == np.dtype(np.float64)
 
+    def test_dtype_unsupported_val_t(self):
+        class Bad(IEEE754):
+            _val_t = ct.c_int
+            _uint_t = ct.c_uint32
+            _bias = 0
+            _exp_bits = slice(0, 1)
+            _sig_bits = slice(1, 32)
+
+            @property
+            def ctypes_value(self) -> ct.c_int:
+                v = self._value
+                assert isinstance(v, ct.c_int)
+                return v
+
+        b = object.__new__(Bad)
+        b._value = ct.c_int(42)
+        b._as_int = 42
+        with pytest.raises(NotImplementedError):
+            b.__numpy_dtype__
+
     def test_array_with_f32_dtype(self):
         arr = np.array([1.5, 2.5], dtype=F32(0))  # F32 as dtype spec
         assert arr.dtype == np.float32
