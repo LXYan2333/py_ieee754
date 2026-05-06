@@ -91,7 +91,7 @@ class IEEE754(ABC):
 
     # ---- Construction ----
 
-    def __new__(cls, value: float | int | str | ct.c_float | ct.c_double) -> IEEE754:
+    def __new__(cls, value: float | int | str | ct.c_float | ct.c_double | None = None) -> IEEE754:
         """Construct an IEEE754 instance from *value*.
 
         Dispatches based on the Python type of *value*
@@ -99,6 +99,7 @@ class IEEE754(ABC):
         ==============  =================================
         Argument type   Behaviour
         ==============  =================================
+        ``None``        Positive zero
         :class:`float`  Round-trip through ctypes
         :class:`int`    Bit-cast (interpret as raw bit pattern)
         :class:`str`    Parse binary (``0b...``), hex (``0x...``), hex-float (``0x1.8p+0``), or decimal
@@ -107,6 +108,8 @@ class IEEE754(ABC):
         ==============  =================================
         """
         match value:
+            case None:
+                return cls._from_bits(0)
             case float():
                 return cls._from_float(value)
             case int():

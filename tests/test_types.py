@@ -3,6 +3,7 @@
 import ctypes as ct
 import math
 
+import numpy as np
 import pytest
 
 from py_ieee754 import F32, F64, IEEE754
@@ -38,6 +39,16 @@ class TestConstruction:
     def test_from_decimal_str(self):
         a = F32("3.14")
         assert float(a) == pytest.approx(3.14, rel=1e-6)
+
+    def test_from_none(self):
+        assert F32(None).is_zero
+        assert F32(None).bits == 0
+        assert F64(None).is_zero
+        assert F64(None).bits == 0
+        assert F32().is_zero
+        assert F32().bits == 0
+        assert F64().is_zero
+        assert F64().bits == 0
 
     def test_invalid_type_raises(self):
         with pytest.raises(TypeError):
@@ -441,3 +452,20 @@ class TestCtypesConstruction:
     def test_from_ctypes_bad_type_raises(self):
         with pytest.raises(TypeError):
             IEEE754.from_ctypes(42)  # type: ignore[arg-type]
+
+
+class TestNumpyDtype:
+    def test_f32_dtype(self):
+        assert F32(1.5).__numpy_dtype__ == np.dtype(np.float32)
+
+    def test_f64_dtype(self):
+        assert F64(1.5).__numpy_dtype__ == np.dtype(np.float64)
+
+    def test_array_with_f32_dtype(self):
+        arr = np.array([1.5, 2.5], dtype=F32(0))  # F32 as dtype spec
+        assert arr.dtype == np.float32
+        assert arr[0] == np.float32(1.5)
+
+    def test_array_with_f64_dtype(self):
+        arr = np.array([1.5, 2.5], dtype=F64(0))
+        assert arr.dtype == np.float64
