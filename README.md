@@ -56,4 +56,9 @@ c_double(1.4142135623730951)
             ct.c_double(0), 
             round_mode=pi7.RoundingMode.DOWNWARD)
 c_double(5e-324) # = bit 0b1
+
+>>> # interop with numpy
+>>> import numpy as np
+>>> np.array([pi7.F32(1.5), pi7.F32(1.6), pi7.F32(1.7)], dtype=pi7.F32())
+array([1.5, 1.6, 1.7], dtype=float32)
 ```
