@@ -22,6 +22,7 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.5", "pyright>=1.1"]
+numpy = ["numpy"]
 
 [tool.scikit-build]
 cmake.version = ">=3.25"

@@ -8,6 +8,7 @@ int (bit-cast), and string representations.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import contextlib as ctx
 import ctypes as ct
 from typing import ClassVar, Self
 
@@ -50,6 +51,7 @@ class IEEE754(ABC):
     _bias: ClassVar[int]
     _exp_bits: ClassVar[slice]
     _sig_bits: ClassVar[slice]
+    __numpy_dtype__: object | None
 
     # ---- Derived class attributes ----
 
@@ -211,19 +213,6 @@ class IEEE754(ABC):
     def __int__(self) -> int:
         """Truncate toward zero, returning the integer part."""
         return int(self.value)
-
-    @property
-    def __numpy_dtype__(self):
-        """numpy dtype interop (NumPy 2.4+).  Returns the corresponding NumPy dtype."""
-        import numpy as np
-
-        match self._val_t:
-            case ct.c_float:
-                return np.dtype(np.float32)
-            case ct.c_double:
-                return np.dtype(np.float64)
-            case _:
-                raise NotImplementedError()
 
     @property
     def bits(self) -> int:
@@ -691,3 +680,10 @@ class F32(IEEE754):
         v = self._value
         assert isinstance(v, ct.c_float)
         return v
+
+
+with ctx.suppress(ImportError):
+    import numpy as np
+
+    F64.__numpy_dtype__ = np.dtype(np.float64)
+    F32.__numpy_dtype__ = np.dtype(np.float32)
