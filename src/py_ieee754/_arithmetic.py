@@ -58,7 +58,7 @@ _divf = _bind(ct.c_float, "py_ieee754_divf")
 _div = _bind(ct.c_double, "py_ieee754_div")
 
 
-def _promote(a: IEEE754 | float, b: IEEE754 | float) -> type[IEEE754]:
+def promote(a: IEEE754 | float, b: IEEE754 | float) -> type[IEEE754]:
     """Determine the result type for a binary operation.
 
     Type promotion rules:
@@ -85,13 +85,13 @@ def _promote(a: IEEE754 | float, b: IEEE754 | float) -> type[IEEE754]:
     return F64
 
 
-def _to_type(value: IEEE754 | float, cls: type[IEEE754]) -> IEEE754:
+def to_type(value: IEEE754 | float, cls: type[IEEE754]) -> IEEE754:
     """Convert *value* to *cls*."""
-    from py_ieee754._types import IEEE754 as _ieee754  # noqa: N811
+    import py_ieee754._types
 
     if isinstance(value, cls):
         return value
-    if isinstance(value, _ieee754):
+    if isinstance(value, py_ieee754._types.IEEE754):
         return cls(value.value)
     return cls(value)
 
@@ -107,9 +107,9 @@ def _bin_op(
     """Promote operands, call the C wrapper, check exceptions, and return result."""
     from py_ieee754._types import F32
 
-    result_type = _promote(a, b)
-    fa = _to_type(a, result_type)
-    fb = _to_type(b, result_type)
+    result_type = promote(a, b)
+    fa = to_type(a, result_type)
+    fb = to_type(b, result_type)
     rnd = -1 if round_mode is None else int(round_mode)
 
     if result_type is F32:

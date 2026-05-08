@@ -400,3 +400,35 @@ class TestPromotionEdges:
     def test_only_b_is_ieee_sub(self):
         result = sub(1.0, F32(2.0))
         assert type(result) is F32
+
+
+class TestFloorDivMod:
+    def test_floordiv(self):
+        assert float(F32(7.0) // F32(3.0)) == 2.0
+
+    def test_floordiv_negative(self):
+        assert float(F32(-7.0) // F32(3.0)) == -3.0
+
+    def test_mod(self):
+        assert float(F32(7.0) % F32(3.0)) == 1.0
+
+    def test_mod_negative(self):
+        assert float(F32(-7.0) % F32(3.0)) == 2.0
+
+    def test_rfloordiv(self):
+        assert float(7.0 // F32(3.0)) == 2.0
+
+    def test_rmod(self):
+        assert float(7.0 % F32(3.0)) == 1.0
+
+    def test_floordiv_f64(self):
+        assert float(F64(10.0) // F64(3.0)) == 3.0
+
+    def test_mod_f64(self):
+        assert float(F64(10.0) % F64(3.0)) == 1.0
+
+    def test_floordiv_type_promotion(self):
+        assert type(F32(7.0) // F64(3.0)) is F64
+
+    def test_mod_type_promotion(self):
+        assert type(F32(7.0) % F64(3.0)) is F64

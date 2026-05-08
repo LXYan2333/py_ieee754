@@ -667,6 +667,42 @@ class IEEE754(ABC):
 
         return div(other, self)
 
+    def __floordiv__(self, other: IEEE754 | float) -> IEEE754:
+        """Return ``self // other`` (floor division)."""
+        from py_ieee754._arithmetic import promote, to_type
+
+        cls = promote(self, other)
+        a = to_type(self, cls).value
+        b = to_type(other, cls).value if not isinstance(other, (float, int)) else other
+        return cls(a // b)
+
+    def __rfloordiv__(self, other: IEEE754 | float) -> IEEE754:
+        """Return ``other // self``."""
+        from py_ieee754._arithmetic import promote, to_type
+
+        cls = promote(other, self)
+        a = other if isinstance(other, (float, int)) else to_type(other, cls).value
+        b = to_type(self, cls).value
+        return cls(a // b)
+
+    def __mod__(self, other: IEEE754 | float) -> IEEE754:
+        """Return ``self % other``."""
+        from py_ieee754._arithmetic import promote, to_type
+
+        cls = promote(self, other)
+        a = to_type(self, cls).value
+        b = to_type(other, cls).value if not isinstance(other, (float, int)) else other
+        return cls(a % b)
+
+    def __rmod__(self, other: IEEE754 | float) -> IEEE754:
+        """Return ``other % self``."""
+        from py_ieee754._arithmetic import promote, to_type
+
+        cls = promote(other, self)
+        a = other if isinstance(other, (float, int)) else to_type(other, cls).value
+        b = to_type(self, cls).value
+        return cls(a % b)
+
 
 class F64(IEEE754):
     """IEEE 754 binary64 (double precision) floating-point number.
