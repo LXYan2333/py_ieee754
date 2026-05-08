@@ -2,7 +2,7 @@
 
 [![cov](https://lxyan2333.github.io/py_ieee754/badges/coverage.svg)](https://github.com/LXYan2333/py_ieee754/actions)
 
-IEEE 754 float number python module with bit-operation and round arithmetic support.
+[IEEE 754](https://ieeexplore.ieee.org/document/8766229) float number python module with bit-operation and round arithmetic support.
 
 ## Install
 
@@ -16,9 +16,14 @@ I write this module with vibe coding, but I carefully read every line in `src` (
 
 I found some bug when I review AI's code, so there might be more. Use with care. I really recommend you to check the code part you are using (usually very short). Bug report is welcomed.
 
-Also note the terminology about "exponent" and "biased exponent":
-- "exponent" means the raw exp bit pattern interpreted as a uint
-- "biased exponent" means the exponent after the IEEE754 bias rule applied, i.e. (exponent - bias) for normalized float, (1 - bias) for denormalized float
+Also note the terminology about "exponent" and "biased exponent".
+
+IEEE 754 says: 
+
+> biased exponent: The sum of the exponent and a constant (bias) chosen to make the biased exponent’s range non-negative.
+
+- "biased exponent" `E` means the raw exp bit pattern interpreted as a uint, i.e. `E = e + bias` for normalized float, `E = 0` for denormalized float.
+- "exponent" `e` means the exponent, `e = 1 - bias` for denormalized float
 
 ## Usage
 
@@ -38,8 +43,8 @@ F32(0b0_01111111_10000000000000000000000)
 
 >>> # Field access & classification
 >>> a = pi7.F32(1.5)
->>> a.sign, a.exponent, a.significand, a.bits
-(0, 127, 4194304, 1069547520)
+>>> a.sign, a.exponent, a.biased_exponent, a.significand, a.bits
+(0, 0, 127, 4194304, 1069547520)
 >>> a.is_nan, a.is_inf, a.is_zero, a.is_subnormal, a.is_normal
 (False, False, False, False, True)
 

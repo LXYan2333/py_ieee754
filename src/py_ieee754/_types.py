@@ -291,7 +291,7 @@ class IEEE754(ABC):
 
         See :meth:`decompose_bin` for a zero-padded binary string version.
         """
-        return self.sign, self.exponent, self.significand
+        return self.sign, self.biased_exponent, self.significand
 
     def decompose_bin(self) -> tuple[str, str, str]:
         """Return ``(sign, biased_exponent, significand)`` as zero-padded binary strings.
@@ -302,7 +302,7 @@ class IEEE754(ABC):
         sig_w = self._sig_width()
         return (
             str(self.sign),
-            format(self.exponent, f"0{exp_w}b"),
+            format(self.biased_exponent, f"0{exp_w}b"),
             format(self.significand, f"0{sig_w}b"),
         )
 
@@ -347,7 +347,7 @@ class IEEE754(ABC):
         _, e, m = self.decompose()
         return type(self).from_components(sign, e, m)
 
-    def with_exponent(self, exponent: int | str) -> Self:
+    def with_biased_exponent(self, exponent: int | str) -> Self:
         """Return a new object with the **biased** exponent replaced.
 
         *exponent* may be an :class:`int` or a binary string of the correct
@@ -364,7 +364,7 @@ class IEEE754(ABC):
         *significand* may be an :class:`int` or a binary string of the correct
         width (e.g. ``"10000000000000000000000"`` for F32).
 
-        See :meth:`with_sign` and :meth:`with_exponent`.
+        See :meth:`with_sign` and :meth:`with_biased_exponent`.
         """
         s, e, _ = self.decompose()
         return type(self).from_components(s, e, significand)
@@ -377,7 +377,7 @@ class IEEE754(ABC):
         return (self._as_int >> (self._total_bits() - 1)) & 1
 
     @property
-    def exponent(self) -> int:
+    def biased_exponent(self) -> int:
         """Biased (stored) exponent field as an integer.
 
         This is the raw exponent value as stored in the bit pattern,
@@ -395,7 +395,7 @@ class IEEE754(ABC):
         return self._as_int & self._sig_mask()
 
     @property
-    def exponent_biased(self) -> int:
+    def exponent(self) -> int:
         """Mathematical exponent after bias adjustment.
 
         For normal numbers this is ``exponent - bias``.  For subnormals it
@@ -403,7 +403,7 @@ class IEEE754(ABC):
         """
         if self.is_subnormal:
             return 1 - self._bias
-        return self.exponent - self._bias
+        return self.biased_exponent - self._bias
 
     # ---- Classification ----
 
@@ -414,7 +414,7 @@ class IEEE754(ABC):
         An IEEE 754 NaN has the maximum biased exponent and a non-zero
         significand.
         """
-        return self.exponent == self._max_exp() and self.significand != 0
+        return self.biased_exponent == self._max_exp() and self.significand != 0
 
     @property
     def is_snan(self) -> bool:
@@ -457,12 +457,12 @@ class IEEE754(ABC):
     @property
     def is_inf(self) -> bool:
         """Whether the value is positive or negative infinity."""
-        return self.exponent == self._max_exp() and self.significand == 0
+        return self.biased_exponent == self._max_exp() and self.significand == 0
 
     @property
     def is_zero(self) -> bool:
         """Whether the value is positive or negative zero."""
-        return self.exponent == 0 and self.significand == 0
+        return self.biased_exponent == 0 and self.significand == 0
 
     @property
     def is_subnormal(self) -> bool:
@@ -471,12 +471,12 @@ class IEEE754(ABC):
         Subnormals have a biased exponent of 0 and a non-zero significand.
         They fill the underflow gap around zero.
         """
-        return self.exponent == 0 and self.significand != 0
+        return self.biased_exponent == 0 and self.significand != 0
 
     @property
     def is_normal(self) -> bool:
         """Whether the value is a normal (non-zero, non-subnormal) finite number."""
-        return 0 < self.exponent < self._max_exp()
+        return 0 < self.biased_exponent < self._max_exp()
 
     @property
     def is_finite(self) -> bool:

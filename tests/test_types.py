@@ -60,21 +60,21 @@ class TestFieldAccess:
         assert F32(1.5).sign == 0
         assert F32(-1.5).sign == 1
 
-    def test_exponent(self):
+    def test_biased_exponent(self):
         # 1.5 = 0x3FC00000 = 0b0 01111111 10000000000000000000000, biased exponent = 0x7F = 127
-        assert F32(1.5).exponent == 127
-        assert F32(0.5).exponent == 126  # 0.5 = 2**-1, bias 127-1=126
+        assert F32(1.5).biased_exponent == 127
+        assert F32(0.5).biased_exponent == 126  # 0.5 = 2**-1, bias 127-1=126
 
     def test_significand(self):
         # 1.5 significand: 0x400000 (23 bits)
         assert F32(1.5).significand == 0x400000
 
-    def test_exponent_biased(self):
-        assert F32(1.5).exponent_biased == 0  # 127 - 127
-        assert F64(1.5).exponent_biased == 0  # 1023 - 1023
+    def test_exponent(self):
+        assert F32(1.5).exponent == 0  # 127 - 127
+        assert F64(1.5).exponent == 0  # 1023 - 1023
         # subnormal
         s = F32.from_bits(1)
-        assert s.exponent_biased == 1 - 127  # 1 - bias
+        assert s.exponent == 1 - 127  # 1 - bias
 
 
 class TestClassification:
@@ -301,8 +301,8 @@ class TestWithFields:
         a = F32(1.5).with_sign(1)
         assert float(a) == pytest.approx(-1.5)
 
-    def test_with_exponent(self):
-        a = F32(1.5).with_exponent(128)
+    def test_with_biased_exponent(self):
+        a = F32(1.5).with_biased_exponent(128)
         assert float(a) == pytest.approx(3.0)
 
     def test_with_significand(self):

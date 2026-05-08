@@ -75,8 +75,7 @@ Type-punning is done via ctypes' `from_buffer_copy`. The `_value` (ctypes) and `
 
 **Key properties / methods on IEEE754:**
 
-- `.sign: int` (0 or 1), `.exponent: int` (unbiased raw exp bits), `.significand: int` (mantissa bits)
-- `.exponent_biased: int` (biased exponent; subnormals return 1 - bias)
+- `.sign: int` (0 or 1), `.biased_exponent: int` (biased/stored exponent), `.exponent: int` (unbiased; subnormals return 1 - bias), `.significand: int` (mantissa bits)
 - `.bits: int` (raw bit pattern), `.bin: str`, `.hex: str`, `.hex_literal: str`, `.float_hex: str`, `.cxx_bitcast: str`
 - `.ctypes_value: ct.c_float | ct.c_double` (abstract property, narrowed in F32/F64)
 - Classification: `.is_nan`, `.is_snan`, `.is_qnan`, `.is_inf`, `.is_zero`, `.is_subnormal`, `.is_normal`, `.is_finite`
@@ -179,7 +178,7 @@ Once the project has code, follow these conventions by default unless a specific
 - **C code**: Use C11 standard. Please read manuals about `<math.h>` and `<fenv.h>` for the C API used. If possible, do not directly write long hex/bin literals, instead generate them with bit operations and write comment to explain it. 
 - **C cinding**: Use `ctypes` to do C binding. Note the content of a lot of c macros is implemetation defined, do not assume their value and get their value in Python at runtime from C.
 - **CI**: A dockerfile to build this project using `scikit-build-core` without Python ABI compatibility (i.e. `wheel.py-api = "py3"`) in manylinux2014, manylinux_2_28, manylinux_2_34, use `auditwheel` to produced universal package. Do not automatically run docker, due to limited disk space. Use Github CI file to build this project and run test on Win, Mac and Linux, on arm and x86 arch. Make the compiled `.whl` file an artifact in Github CI.
-- **IEEE754**: The unbiased means the raw exp num, and the biased means the number you get after ieee764 bias number is applied to raw exp (for denormal, 1 - bias).
+- **IEEE754**: Terminology: biased exponent: The sum of the exponent and a constant (bias) chosen to make the biased exponent’s range non-negative.
 
 ## Tools
 
