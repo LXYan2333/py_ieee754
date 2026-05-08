@@ -309,6 +309,32 @@ class TestWithFields:
         a = F32(1.5).with_significand(0x200000)
         assert float(a) == pytest.approx(1.25)
 
+    def test_with_exponent_normal(self):
+        a = F32(1.5).with_exponent(1)  # stored = 1 + 127 = 128
+        assert float(a) == pytest.approx(3.0)  # 2^1 * 1.5
+
+    def test_with_exponent_subnormal(self):
+        s = F32.from_bits(1)  # smallest subnormal
+        a = s.with_exponent(-126, subnormal=True)
+        assert a.is_subnormal
+        assert a.biased_exponent == 0
+        assert a.bits == 1  # bits unchanged
+
+    def test_with_exponent_ambiguity(self):
+        # same e = -126: subnormal=True → stored=0, subnormal=False → stored=1
+        # subnormal: 0.m × 2^-126    normal: 1.m × 2^-126
+        # ratio = (1 + m/2^23) / (m/2^23) = 2^23 + 1  (for m=1)
+        s = F32.from_bits(1)
+        denorm = s.with_exponent(-126, subnormal=True)
+        assert denorm.biased_exponent == 0
+        normal = s.with_exponent(-126, subnormal=False)
+        assert normal.biased_exponent == 1
+        assert float(normal) == (2**23 + 1) * float(denorm)
+
+    def test_with_exponent_out_of_range(self):
+        with pytest.raises(ValueError):
+            F32(1.0).with_exponent(128)  # stored = 255, reserved
+
 
 class TestRepr:
     def test_repr(self):

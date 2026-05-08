@@ -358,6 +358,32 @@ class IEEE754(ABC):
         s, _, m = self.decompose()
         return type(self).from_components(s, exponent, m)
 
+    def with_exponent(self, e: int, *, subnormal: bool = False) -> Self:
+        """Return a new object with the **mathematical** (unbiased) exponent.
+
+        *e* is the exponent:
+        - `e = 0` for [1.0, 2.0)
+        - `e = -1` for[0.5, 1.0), etc.
+
+        Valid range is ``[1 - bias, bias]`` (e.g. ``[-126, 127]`` for F32).
+
+        Raises :class:`ValueError` if out of range.
+
+        The subnormal exponent ``e = 1 - bias`` is ambiguous with the smallest
+        normal exponent (both are ``-126`` for F32).  Pass ``subnormal=True``
+        to set the stored exponent to 0.
+
+        See :meth:`exponent` and :meth:`with_biased_exponent`.
+        """
+        stored = 0 if subnormal else e + self._bias
+        if not 0 <= stored < self._max_exp():
+            raise ValueError(
+                f"exponent {e} out of range [{1 - self._bias}, {self._bias}]"
+                f" for {type(self).__name__}"
+            )
+        s, _, m = self.decompose()
+        return type(self).from_components(s, stored, m)
+
     def with_significand(self, significand: int | str) -> Self:
         """Return a new object with the trailing significand replaced.
 
