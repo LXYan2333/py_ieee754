@@ -12,33 +12,33 @@ from py_ieee754 import F32, F64, IEEE754
 class TestConstruction:
     def test_from_float(self):
         a = F32(1.5)
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
         b = F64(-3.14)
-        assert float(b) == pytest.approx(-3.14)
+        assert float(b) == -3.14
 
     def test_from_int_bitcast(self):
         a = F32(0x3FC00000)  # 1.5
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_from_bits(self):
         a = F32.from_bits(0x40490FDB)
-        assert float(a) == pytest.approx(3.1415927410125732)
+        assert float(a) == 3.1415927410125732
 
     def test_from_hex_str(self):
         a = F32("0x3FC00000")
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_from_bin_str(self):
         a = F32("0b00111111110000000000000000000000")
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_from_float_hex_str(self):
         a = F64("0x1.8p+0")
         assert float(a) == 1.5
 
     def test_from_decimal_str(self):
-        a = F32("3.14")
-        assert float(a) == pytest.approx(3.14, rel=1e-6)
+        a = F32("3.5")
+        assert float(a) == 3.5
 
     def test_from_none(self):
         assert F32(None).is_zero
@@ -52,7 +52,7 @@ class TestConstruction:
 
     def test_invalid_type_raises(self):
         with pytest.raises(TypeError):
-            F32([])
+            F32([])  # pyright: ignore[reportArgumentType]
 
 
 class TestFieldAccess:
@@ -122,7 +122,7 @@ class TestClassification:
 
 class TestConversion:
     def test_float(self):
-        assert float(F32(3.14)) == pytest.approx(3.14, rel=1e-6)
+        assert float(F32(3.5)) == 3.5
 
     def test_int_truncates(self):
         assert int(F32(3.14)) == 3
@@ -225,7 +225,7 @@ class TestConversion:
     def test_ctypes_value(self):
         a = F32(1.5).ctypes_value
         assert isinstance(a, ct.c_float)
-        assert a.value == pytest.approx(1.5)
+        assert a.value == 1.5
 
 
 class TestComparison:
@@ -281,15 +281,15 @@ class TestDecompose:
 class TestFromComponents:
     def test_from_components_int(self):
         a = F32.from_components(0, 127, 0x400000)
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_from_components_str(self):
         a = F32.from_components("0", "01111111", "10000000000000000000000")
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_from_bin_str(self):
         a = F32.from_bin_str("00111111110000000000000000000000")
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_from_bin_str_wrong_length(self):
         with pytest.raises(ValueError):
@@ -299,19 +299,19 @@ class TestFromComponents:
 class TestWithFields:
     def test_with_sign(self):
         a = F32(1.5).with_sign(1)
-        assert float(a) == pytest.approx(-1.5)
+        assert float(a) == -1.5
 
     def test_with_biased_exponent(self):
         a = F32(1.5).with_biased_exponent(128)
-        assert float(a) == pytest.approx(3.0)
+        assert float(a) == 3.0
 
     def test_with_significand(self):
         a = F32(1.5).with_significand(0x200000)
-        assert float(a) == pytest.approx(1.25)
+        assert float(a) == 1.25
 
     def test_with_exponent_normal(self):
         a = F32(1.5).with_exponent(1)  # stored = 1 + 127 = 128
-        assert float(a) == pytest.approx(3.0)  # 2^1 * 1.5
+        assert float(a) == 3.0  # 2^1 * 1.5
 
     def test_with_exponent_subnormal(self):
         s = F32.from_bits(1)  # smallest subnormal
@@ -348,19 +348,19 @@ class TestRepr:
 class TestMatchCaseConstruction:
     def test_match_float(self):
         a = F32(1.5)
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_match_int(self):
         a = F32(0x3FC00000)
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_match_str_bin(self):
         a = F32("0b00111111110000000000000000000000")
-        assert float(a) == pytest.approx(1.5)
+        assert float(a) == 1.5
 
     def test_match_else_raises(self):
         with pytest.raises(TypeError):
-            F32([])
+            F32([])  # pyright: ignore[reportArgumentType]
 
 
 class TestAllComparisons:
@@ -445,22 +445,22 @@ class TestCtypesConstruction:
     def test_from_ctypes_f32(self):
         result = IEEE754.from_ctypes(ct.c_float(1.5))
         assert type(result) is F32
-        assert float(result) == pytest.approx(1.5)
+        assert float(result) == 1.5
 
     def test_from_ctypes_f64(self):
         result = IEEE754.from_ctypes(ct.c_double(1.5))
         assert type(result) is F64
-        assert float(result) == pytest.approx(1.5)
+        assert float(result) == 1.5
 
     def test_f32_from_ctypes_float(self):
         result = F32(ct.c_float(1.5))
         assert type(result) is F32
-        assert float(result) == pytest.approx(1.5)
+        assert float(result) == 1.5
 
     def test_f64_from_ctypes_double(self):
         result = F64(ct.c_double(1.5))
         assert type(result) is F64
-        assert float(result) == pytest.approx(1.5)
+        assert float(result) == 1.5
 
     def test_f32_from_wrong_ctypes_raises(self):
         with pytest.raises(TypeError):
@@ -473,7 +473,7 @@ class TestCtypesConstruction:
     def test_f64_ctypes_value(self):
         v = F64(1.5).ctypes_value
         assert isinstance(v, ct.c_double)
-        assert v.value == pytest.approx(1.5)
+        assert v.value == 1.5
 
     def test_from_ctypes_bad_type_raises(self):
         with pytest.raises(TypeError):
