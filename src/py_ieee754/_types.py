@@ -307,7 +307,14 @@ class IEEE754(ABC):
         )
 
     @classmethod
-    def from_components(cls, sign: int | str, exponent: int | str, significand: int | str) -> Self:
+    def from_components(
+        cls,
+        sign: int | str,
+        exponent: int | str,
+        significand: int | str,
+        *,
+        strict: bool = False,
+    ) -> Self:
         """Create from raw IEEE 754 fields.
 
         *sign* is the sign bit (0 or 1), *exponent* is the **biased** (stored)
@@ -317,16 +324,27 @@ class IEEE754(ABC):
         Each argument may be an :class:`int` or a binary string (e.g. ``"0"``,
         ``"01111111"``).
 
+        If *strict* is true, raise :class:`ValueError` when any field exceeds its
+        bit width (sign > 1, exponent > max_exp, significand > sig_mask).
+
         >>> F32.from_components(0, 127, 0x400000)
         F32(0b0_01111111_10000000000000000000000)
         """
         s = int(sign, 2) if isinstance(sign, str) else sign
         e = int(exponent, 2) if isinstance(exponent, str) else exponent
         m = int(significand, 2) if isinstance(significand, str) else significand
+        if strict:
+            if s not in (0, 1):
+                raise ValueError(f"sign must be 0 or 1, got {s}")
+            if e > cls._max_exp() or e < 0:
+                raise ValueError(f"exponent must be in [0, {cls._max_exp()}], got {e}")
+            if m > cls._sig_mask() or m < 0:
+                raise ValueError(f"significand must be in [0, {cls._sig_mask()}], got {m}")
+        else:
+            s &= 1
+            e &= cls._max_exp()
+            m &= cls._sig_mask()
         total = cls._total_bits()
-        s &= 1
-        e &= cls._max_exp()
-        m &= cls._sig_mask()
         bits = (s << (total - 1)) | (e << cls._exp_shift()) | m
         return cls._from_bits(bits)
 
@@ -342,26 +360,47 @@ class IEEE754(ABC):
             raise ValueError(f"expected {total} bits, got {len(s)}")
         return cls._from_bits(int(s, 2))
 
-    def with_sign(self, sign: int | str) -> Self:
+    def with_sign(
+        self,
+        sign: int | str,
+        *,
+        strict: bool = False,
+    ) -> Self:
         """Return a new object with *sign* replaced; exponent and significand unchanged.
 
         *sign* may be 0, 1, or a binary string ``"0"`` / ``"1"``.
+
+        If *strict* is true, raise :class:`ValueError` when *sign* is not 0 or 1.
         """
         _, e, m = self.decompose()
-        return type(self).from_components(sign, e, m)
+        return type(self).from_components(sign, e, m, strict=strict)
 
-    def with_biased_exponent(self, exponent: int | str) -> Self:
+    def with_biased_exponent(
+        self,
+        exponent: int | str,
+        *,
+        strict: bool = False,
+    ) -> Self:
         """Return a new object with the **biased** exponent replaced.
 
         *exponent* may be an :class:`int` or a binary string of the correct
         width (e.g. ``"01111111"`` for F32).
 
+        If *strict* is true, raise :class:`ValueError` when *exponent* exceeds
+        the exponent bit width.
+
         See :meth:`with_sign` and :meth:`with_significand`.
         """
         s, _, m = self.decompose()
-        return type(self).from_components(s, exponent, m)
+        return type(self).from_components(s, exponent, m, strict=strict)
 
-    def with_exponent(self, e: int, *, subnormal: bool = False) -> Self:
+    def with_exponent(
+        self,
+        e: int,
+        *,
+        subnormal: bool = False,
+        strict: bool = False,
+    ) -> Self:
         """Return a new object with the **mathematical** (unbiased) exponent.
 
         *e* is the exponent:
@@ -376,6 +415,9 @@ class IEEE754(ABC):
         normal exponent (both are ``-126`` for F32).  Pass ``subnormal=True``
         to set the stored exponent to 0.
 
+        If *strict* is true, also raise :class:`ValueError` if the stored
+        exponent exceeds its bit width.
+
         See :meth:`exponent` and :meth:`with_biased_exponent`.
         """
         stored = 0 if subnormal else e + self._bias
@@ -385,18 +427,26 @@ class IEEE754(ABC):
                 f" for {type(self).__name__}"
             )
         s, _, m = self.decompose()
-        return type(self).from_components(s, stored, m)
+        return type(self).from_components(s, stored, m, strict=strict)
 
-    def with_significand(self, significand: int | str) -> Self:
+    def with_significand(
+        self,
+        significand: int | str,
+        *,
+        strict: bool = False,
+    ) -> Self:
         """Return a new object with the trailing significand replaced.
 
         *significand* may be an :class:`int` or a binary string of the correct
         width (e.g. ``"10000000000000000000000"`` for F32).
 
+        If *strict* is true, raise :class:`ValueError` when *significand* exceeds
+        the significand bit width.
+
         See :meth:`with_sign` and :meth:`with_biased_exponent`.
         """
         s, e, _ = self.decompose()
-        return type(self).from_components(s, e, significand)
+        return type(self).from_components(s, e, significand, strict=strict)
 
     # ---- Field access ----
 

@@ -297,6 +297,22 @@ class TestFromComponents:
         a = F32.from_components(0, 0, -1)
         assert a.sign == 0
 
+    def test_strict_mode_sign_out_of_range(self):
+        with pytest.raises(ValueError, match="sign"):
+            F32.from_components(2, 0, 0, strict=True)
+
+    def test_strict_mode_exponent_out_of_range(self):
+        with pytest.raises(ValueError, match="exponent"):
+            F32.from_components(0, 256, 0, strict=True)
+
+    def test_strict_mode_significand_out_of_range(self):
+        with pytest.raises(ValueError, match="significand"):
+            F32.from_components(0, 0, 1 << 23, strict=True)
+
+    def test_strict_mode_valid(self):
+        a = F32.from_components(0, 127, 0x400000, strict=True)
+        assert float(a) == 1.5
+
     def test_from_bin_str(self):
         a = F32.from_bin_str("00111111110000000000000000000000")
         assert float(a) == 1.5
