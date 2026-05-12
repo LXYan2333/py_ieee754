@@ -324,6 +324,9 @@ class IEEE754(ABC):
         e = int(exponent, 2) if isinstance(exponent, str) else exponent
         m = int(significand, 2) if isinstance(significand, str) else significand
         total = cls._total_bits()
+        s &= 1
+        e &= cls._max_exp()
+        m &= cls._sig_mask()
         bits = (s << (total - 1)) | (e << cls._exp_shift()) | m
         return cls._from_bits(bits)
 

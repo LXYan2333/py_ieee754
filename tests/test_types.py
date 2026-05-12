@@ -287,6 +287,16 @@ class TestFromComponents:
         a = F32.from_components("0", "01111111", "10000000000000000000000")
         assert float(a) == 1.5
 
+    def test_from_components_sign_not_corrupted_by_negative_exp(self):
+        """F32.from_components(0, -1, 0) should have sign=0, not 1."""
+        a = F32.from_components(0, -1, 0)
+        assert a.sign == 0
+
+    def test_from_components_sign_not_corrupted_by_negative_sig(self):
+        """Negative significand should be masked, not corrupt sign."""
+        a = F32.from_components(0, 0, -1)
+        assert a.sign == 0
+
     def test_from_bin_str(self):
         a = F32.from_bin_str("00111111110000000000000000000000")
         assert float(a) == 1.5
