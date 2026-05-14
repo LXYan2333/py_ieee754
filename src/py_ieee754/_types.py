@@ -12,6 +12,7 @@ import contextlib as ctx
 import ctypes as ct
 from typing import ClassVar, Self
 
+from py_ieee754._lib import clib
 from py_ieee754._math._manipulation import nextafter
 
 # ---- Type aliases ----
@@ -284,11 +285,12 @@ class IEEE754(ABC):
 
     @property
     def float_hex(self) -> str:
-        """IEEE 754 hex-float representation (e.g. ``"0x1.8000000000000p+0"`` for 1.5).
+        """IEEE 754 hex-float representation via C99 ``%a`` formatting.
 
-        Returns ``"nan"``, ``"inf"``, or ``"0x0.0p+0"`` for special values.
+        >>> F64(1.5).float_hex
+        '0x1.8p+0'
         """
-        return self.value.hex()
+        return _float_hex(self.ctypes_value)
 
     @property
     def cxx_bitcast(self) -> str:
@@ -844,3 +846,26 @@ with ctx.suppress(ImportError):
 
     F64.__numpy_dtype__ = np.dtype(np.float64)
     F32.__numpy_dtype__ = np.dtype(np.float32)
+
+
+_float_hex_d = clib.py_ieee754_float_hex_d
+_float_hex_d.argtypes = [ct.c_double, ct.c_char_p, ct.c_int]
+_float_hex_d.restype = ct.c_int
+
+_float_hex_f = clib.py_ieee754_float_hex_f
+_float_hex_f.argtypes = [ct.c_float, ct.c_char_p, ct.c_int]
+_float_hex_f.restype = ct.c_int
+
+_FLOAT_HEX_BUFSIZE = 64
+
+
+def _float_hex(x: ct.c_float | ct.c_double) -> str:
+    """Format a ctypes float or double as a C99 hex-float string (``%a``)."""
+    buf = ct.create_string_buffer(_FLOAT_HEX_BUFSIZE)
+    if isinstance(x, ct.c_float):
+        strlen: int = _float_hex_f(x, buf, _FLOAT_HEX_BUFSIZE)
+    else:
+        strlen: int = _float_hex_d(x, buf, _FLOAT_HEX_BUFSIZE)
+    assert strlen < _FLOAT_HEX_BUFSIZE
+
+    return buf.value.decode()

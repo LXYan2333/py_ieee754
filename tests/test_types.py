@@ -441,8 +441,8 @@ class TestFloatHexSpecialValues:
         assert F32.inf(negative=True).float_hex == "-inf"
 
     def test_zero_float_hex(self):
-        assert F32.zero().float_hex == "0x0.0p+0"
-        assert F32.zero(negative=True).float_hex == "-0x0.0p+0"
+        assert F32.zero().float_hex == "0x0p+0"
+        assert F32.zero(negative=True).float_hex == "-0x0p+0"
 
 
 class TestF64Conversions:

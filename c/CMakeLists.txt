@@ -1,4 +1,15 @@
-add_library(py_ieee754_wrappers SHARED wrappers.c _math_power.c _math_basic.c _math_exponential.c _math_trigonometric.c _math_hyperbolic.c _math_error_gamma.c _math_nearest_int.c _math_manipulation.c)
+add_library(py_ieee754_wrappers SHARED 
+    wrappers.c
+    _math_power.c
+    _math_basic.c
+    _math_exponential.c
+    _math_trigonometric.c
+    _math_hyperbolic.c
+    _math_error_gamma.c
+    _math_nearest_int.c
+    _math_manipulation.c
+    _float_hex_format.c
+)
 
 set_target_properties(py_ieee754_wrappers PROPERTIES PREFIX "lib")
 
