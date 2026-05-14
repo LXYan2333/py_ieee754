@@ -289,6 +289,11 @@ class IEEE754(ABC):
 
         >>> F64(1.5).float_hex
         '0x1.8p+0'
+
+        Note: behaviour is different on different platforms. For example:
+        >>> F32().float_hex
+        '0x0.0000000000000p+0'  # on Windows
+        '0x0p+0'                # on Linux/MacOS
         """
         return _float_hex(self.ctypes_value)
 
