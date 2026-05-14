@@ -521,3 +521,82 @@ class TestNumpyDtype:
     def test_array_with_f64_dtype(self):
         arr = np.array([1.5, 2.5], dtype=F64)
         assert arr.dtype == np.float64
+
+
+class TestNextPrev:
+    def test_next_up_normal(self):
+        a = F32(1.0)
+        n = a.next_up
+        assert n.is_finite
+        assert float(n) > 1.0
+        assert n.bits == a.bits + 1
+
+    def test_next_down_normal(self):
+        a = F32(1.0)
+        n = a.next_down
+        assert n.is_finite
+        assert float(n) < 1.0
+        assert n.bits == a.bits - 1
+
+    def test_next_up_is_reversible(self):
+        a = F32(1.0)
+        assert a.next_up.next_down == a
+        assert a.next_down.next_up == a
+
+    def test_next_up_zero(self):
+        n = F32.zero().next_up
+        assert n.bits == 1  # smallest positive subnormal
+        assert float(n) > 0.0
+
+    def test_next_down_zero(self):
+        n = F32.zero().next_down
+        assert n == F32.from_components(1, 0, 1)  # -smallest subnormal
+
+    def test_next_up_neg_zero(self):
+        n = F32.zero(negative=True).next_up
+        assert n == F32.from_components(0, 0, 1)
+
+    def test_next_down_neg_zero(self):
+        n = F32.zero(negative=True).next_down
+        assert n == F32.from_components(1, 0, 1)
+
+    def test_next_up_inf(self):
+        assert F32.inf().next_up.is_inf
+        assert F32.inf().next_up.sign == 0
+
+    def test_next_down_neg_inf(self):
+        assert F32.inf(negative=True).next_down.is_inf
+        assert F32.inf(negative=True).next_down.sign == 1
+
+    def test_next_up_nan(self):
+        assert F32.nan().next_up.is_nan
+        assert F32.snan().next_up.is_nan
+
+    def test_next_down_nan(self):
+        assert F32.nan().next_down.is_nan
+        assert F32.snan().next_down.is_nan
+
+    def test_f64_next_up(self):
+        a = F64(1.0)
+        n = a.next_up
+        assert float(n) > 1.0
+        assert n.bits == a.bits + 1
+
+    def test_f64_next_up_zero(self):
+        n = F64.zero().next_up
+        assert n.bits == 1
+        assert float(n) > 0.0
+
+    def test_f64_next_down_zero(self):
+        n = F64.zero().next_down
+        assert n == F64.from_components(1, 0, 1)
+
+    def test_negate_cycle(self):
+        a = F32(3.14)
+        assert (-a).next_up == -(a.next_down)
+
+    def test_subnormal_step(self):
+        s = F32.from_components(0, 0, 1)
+        n = s.next_up
+        assert n == F32.from_components(0, 0, 2)
+        assert float(n) == 2 * float(s)

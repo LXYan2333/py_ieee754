@@ -12,6 +12,8 @@ import contextlib as ctx
 import ctypes as ct
 from typing import ClassVar, Self
 
+from py_ieee754._math._manipulation import nextafter
+
 # ---- Type aliases ----
 
 type ct_float_type = type[ct.c_float] | type[ct.c_double]
@@ -153,6 +155,46 @@ class IEEE754(ABC):
             raise TypeError(f"cannot construct {cls.__name__} from {type(value).__name__}")
         c_uint = cls._uint_t.from_buffer_copy(value)
         return cls._make(value, c_uint.value)
+
+    # ---- Next/previous representable ----
+
+    @property
+    def next_up(self) -> Self:
+        """Smallest representable value greater than ``self`` (toward +∞).
+
+        Equivalent to ``nextafter(x, +∞)``.
+
+        >>> F32(1.0).next_up
+        F32(0b0_01111111_00000000000000000000001)
+        """
+        v = self.ctypes_value
+        t = type(self).inf().ctypes_value
+        if isinstance(v, ct.c_float) and isinstance(t, ct.c_float):  # noqa: SIM114
+            result = nextafter(v, t)
+        elif isinstance(v, ct.c_double) and isinstance(t, ct.c_double):
+            result = nextafter(v, t)
+        else:
+            raise TypeError()
+        return type(self)._from_ctypes(result)
+
+    @property
+    def next_down(self) -> Self:
+        """Largest representable value less than ``self`` (toward -∞).
+
+        Equivalent to ``nextafter(x, -∞)``.
+
+        >>> F32(1.0).next_down
+        F32(0b0_01111110_11111111111111111111111)
+        """
+        v = self.ctypes_value
+        t = type(self).inf(negative=True).ctypes_value
+        if isinstance(v, ct.c_float) and isinstance(t, ct.c_float):  # noqa: SIM114
+            result = nextafter(v, t)
+        elif isinstance(v, ct.c_double) and isinstance(t, ct.c_double):
+            result = nextafter(v, t)
+        else:
+            raise TypeError()  # pragma:no cover
+        return type(self)._from_ctypes(result)
 
     @classmethod
     def _make(cls, c_val: ct.c_float | ct.c_double, bits: int) -> Self:
