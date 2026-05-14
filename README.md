@@ -36,6 +36,8 @@ IEEE 754 says:
 F32(0b0_01111111_10000000000000000000000)
 >>> pi7.F64.from_components("0", "0"*11, "1"*52)# construct from sign, exp and sig bits
 F64(0b0_00000000000_1111111111111111111111111111111111111111111111111111)
+>>> pi7.F64.from_components("0", "0"*11, -1)    # use -1 to fill specific part with 1
+F64(0b0_00000000000_1111111111111111111111111111111111111111111111111111)
 >>> pi7.F32.from_bits(0x3FC00000)               # from bit pattern
 F32(0b0_01111111_10000000000000000000000)
 >>> pi7.IEEE754.from_ctypes(ct.c_float(1.5))    # auto-dispatch (→ F32)
