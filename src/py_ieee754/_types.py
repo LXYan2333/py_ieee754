@@ -726,6 +726,12 @@ class IEEE754(ABC):
         """Return ``abs(self)`` (clear the sign bit)."""
         return self.with_sign(0)
 
+    def __round__(self, ndigits: int | None = None) -> int | Self:
+        """Round to *ndigits* decimal places (or nearest integer if *ndigits* is ``None``)."""
+        if ndigits is None:
+            return round(self.value)
+        return type(self)(round(self.value, ndigits))
+
     def __add__(self, other: IEEE754 | float) -> IEEE754:
         """Return ``self + other``.  Delegates to :func:`~py_ieee754.add`."""
         from py_ieee754._arithmetic import add

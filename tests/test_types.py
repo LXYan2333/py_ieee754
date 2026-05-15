@@ -604,3 +604,32 @@ class TestNextPrev:
         n = s.next_up
         assert n == F32.from_components(0, 0, 2)
         assert float(n) == 2 * float(s)
+
+
+class TestRound:
+    def test_round_no_ndigits(self):
+        assert round(F32(3.14)) == 3
+        assert isinstance(round(F32(3.14)), int)
+
+    def test_round_with_ndigits(self):
+        result = round(F32(3.14), 1)
+        assert isinstance(result, F32)
+        assert float(result) == F32(round(3.14, 1)).value
+
+    def test_round_f64(self):
+        assert round(F64(3.14)) == 3
+        result = round(F64(3.14), 2)
+        assert isinstance(result, F64)
+        assert float(result) == round(3.14, 2)
+
+    def test_round_tie_to_even(self):
+        assert round(F32(2.5)) == 2
+        assert round(F32(3.5)) == 4
+
+    def test_round_negative(self):
+        assert round(F32(-3.14)) == -3
+        assert float(round(F32(-3.14), 1)) == F32(round(-3.14, 1)).value
+
+    def test_round_zero(self):
+        assert round(F32.zero()) == 0
+        assert round(F32.zero(negative=True)) == 0
