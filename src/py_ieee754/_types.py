@@ -10,7 +10,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import contextlib as ctx
 import ctypes as ct
-from typing import ClassVar, Self
+from typing import ClassVar, Self, overload
 
 from py_ieee754._lib import clib
 from py_ieee754._math._manipulation import nextafter
@@ -726,6 +726,10 @@ class IEEE754(ABC):
         """Return ``abs(self)`` (clear the sign bit)."""
         return self.with_sign(0)
 
+    @overload
+    def __round__(self, ndigits: None = None) -> int: ...
+    @overload
+    def __round__(self, ndigits: int) -> Self: ...
     def __round__(self, ndigits: int | None = None) -> int | Self:
         """Round to *ndigits* decimal places (or nearest integer if *ndigits* is ``None``)."""
         if ndigits is None:
