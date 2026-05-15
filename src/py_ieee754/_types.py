@@ -324,6 +324,11 @@ class IEEE754(ABC):
         return self._total_bits()
 
     @property
+    def size_bytes(self) -> int:
+        """Size in bytes (4 for F32, 8 for F64)."""
+        return self._total_bits() // 8
+
+    @property
     def exp_len(self) -> int:
         """Number of exponent bits (8 for F32, 11 for F64)."""
         return self._exp_width()

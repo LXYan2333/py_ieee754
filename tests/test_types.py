@@ -458,6 +458,10 @@ class TestF64Conversions:
         assert F32(1.5).size_bits == 32
         assert F64(1.5).size_bits == 64
 
+    def test_size_bytes(self):
+        assert F32(1.5).size_bytes == 4
+        assert F64(1.5).size_bytes == 8
+
     def test_exp_bits(self):
         assert F32(1.5).exp_len == 8
         assert F64(1.5).exp_len == 11
