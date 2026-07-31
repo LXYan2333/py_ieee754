@@ -96,7 +96,7 @@ class IEEE754(ABC):
 
     # ---- Construction ----
 
-    def __new__(cls, value: float | int | str | ct.c_float | ct.c_double | None = None) -> IEEE754:
+    def __new__(cls, value: float | int | str | ct.c_float | ct.c_double | None = None) -> Self:
         """Construct an IEEE754 instance from *value*.
 
         Dispatches based on the Python type of *value*
