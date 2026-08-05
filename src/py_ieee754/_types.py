@@ -263,6 +263,16 @@ class IEEE754(ABC):
         return self._as_int
 
     @property
+    def representation_key(self) -> tuple[type[Self], int]:
+        """Return a hashable key identifying the concrete format and raw bits.
+
+        Unlike numeric equality, this distinguishes :class:`F32` from
+        :class:`F64`, positive zero from negative zero, and different NaN
+        encodings.
+        """
+        return type(self), self.bits
+
+    @property
     def bin(self) -> str:
         """Bit pattern as a binary string (e.g. ``"0b00111111..."``)."""
         return f"0b{self._as_int:0{self._total_bits()}b}"
@@ -713,7 +723,15 @@ class IEEE754(ABC):
         return NotImplemented
 
     def __hash__(self) -> int:
-        """Hash of the underlying float value."""
+        """Hash the numeric value, using the representation for NaNs.
+
+        Accessing ``ctypes.value`` creates a new Python float.  Python hashes
+        NaNs by object identity, so hashing that temporary value would make the
+        hash change between calls.  A NaN never compares equal, making its
+        stable representation hash valid for the hashing contract.
+        """
+        if self.is_nan:
+            return hash(self.representation_key)
         return hash(self._value.value)
 
     # ---- Arithmetic operators (delegate to _arithmetic.py) ----

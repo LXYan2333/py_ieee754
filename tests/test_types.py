@@ -132,6 +132,17 @@ class TestConversion:
     def test_bits_property(self):
         assert F32(1.5).bits == 0x3FC00000
 
+    def test_representation_key(self):
+        assert F32(1.0).representation_key == (F32, 0x3F800000)
+        assert F64(1.0).representation_key == (F64, 0x3FF0000000000000)
+
+    def test_representation_key_distinguishes_equal_values(self):
+        assert F32(1.0) == F64(1.0)
+        keys = {F32(1.0).representation_key, F64(1.0).representation_key}
+        assert len(keys) == 2
+        assert F32.zero().representation_key != F32.zero(negative=True).representation_key
+        assert F32.nan().representation_key != F32.snan().representation_key
+
     def test_bin(self):
         b = F32(1.5).bin
         assert b.startswith("0b")
@@ -244,6 +255,18 @@ class TestComparison:
 
     def test_hash_equal(self):
         assert hash(F32(1.5)) == hash(F64(1.5))
+
+    @pytest.mark.parametrize("float_type", [F32, F64])
+    def test_nan_hash_is_stable(self, float_type: type[IEEE754]):
+        nan = float_type.nan()
+        expected = hash(nan)
+
+        # Keep temporary Python floats alive so ctypes cannot reuse the same
+        # object address when returning ``nan.value``.
+        temporary_values = [nan.value for _ in range(256)]
+
+        assert temporary_values
+        assert hash(nan) == expected
 
 
 class TestSpecialValues:
